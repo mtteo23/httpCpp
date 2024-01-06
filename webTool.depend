@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1703691687 source:c:\users\luigi\onedrive\documenti\cose da tenere\progetti\c++\non finiti\webtool\main.cpp
+	<windows.h>
+	<string>
+	<stdio.h>
+	<iostream>
+	<fstream>
+

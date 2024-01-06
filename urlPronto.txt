@@ -1,0 +1,1 @@
+POST /login HTTP/1.1Host: web-08.challs.olicyber.itUser-Agent: python-requests/2.31.0Accept-Encoding: gzip, deflateAccept: */*Connection: keep-aliveContent-Length: 42Content-Type: application/json{"username": "admin", "password": "admin"}

@@ -1,0 +1,27 @@
+POST /login HTTP/1.0	
+Host: web-09.challs.olicyber.it	
+Content-Type: application/json	
+Content-Length: 48	
+	
+	
+{
+"username": "admin",
+"password": "admin"
+}
+
+
+POST /login HTTP/1.0
+Host: web-09.challs.olicyber.it
+Accept: application/json
+Content-Type: application/json
+Content-Length: 48
+
+{
+	"username": "admin",
+	"password": "admin"
+}
+
+
+
+
+

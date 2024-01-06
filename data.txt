@@ -1,0 +1,10 @@
+HTTP/1.0 401 Unauthorized
+Content-Length: 57
+Content-Type: application/json
+Date: Wed, 27 Dec 2023 15:51:28 GMT
+Server: nginx/1.21.6
+
+{
+  "error": "Unauthorized",
+  "message": "Bad session"
+}

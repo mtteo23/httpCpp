@@ -1,0 +1,4 @@
+http://web-08.challs.olicyber.it/login
+2 0 0
+username=admin
+password=admin
