@@ -21,8 +21,7 @@ int main()
 {
     if ( WSAStartup(0x101, &wsaData) != 0)
         return -1;
-    cout << "\nAvvio Web\n" << endl;
-    std::cin.ignore();
+
     while(1)
     {
         Menu();
@@ -32,15 +31,14 @@ int main()
     return 0;
 }
 
-
 void Menu()
 {
     string server;
     string sendStr="";
     string url="";
 
-    string metodo[]={"GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH"};
-    int indMetodo=0;
+    string listMetodo[]={"GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH"};
+    string metodo="GET";
 
     int nHeaders=0;
     string header[50]={};
@@ -50,14 +48,43 @@ void Menu()
     string parametro[50]={};
     int nCampiForm=0;
     string campoForm[50]={};
+    std::ofstream fout("data.txt");
+    string risposta;
+    string data, headerRisposta;
 
+    /*
+    system("cls");
+    std::cout<<metodo[indMetodo]<<": "<<url<<" |\n";
+    std::cout<<"\nHeader: \n";
+    for(int i=0; i<nHeaders; i++)
+            cout<<header[i]<<std::endl;
+    std::cout<<"\nCookie: \n";
+    for(int i=0; i<nCookies; i++)
+        cout<<cookie[i]<<std::endl;
+    std::cout<<"\nParametri: \n";
+    for(int i=0; i<nParametri; i++)
+        cout<<parametro[i]<<std::endl;
+    std::cout<<"\nCampi Form: \n";
+    for(int i=0; i<nCampiForm; i++)
+        cout<<campoForm[i]<<std::endl;
+
+    sendStr=calcolaRichiesta(metodo[indMetodo], url, nHeaders, header, nCookies, cookie, nCampiForm, campoForm, nParametri, parametro, server);
+    cout<<"\n"<<sendStr;
+
+    ///invia
+
+    cout<<"\nInvio...\n";
+    risposta=invia(sendStr, server);
+    cout<<"\nRisposta ricevuta:\n"<<risposta<<"\nFine risposta\n";
+    fout<<risposta;
+    fout.close();
+    */
     char scelta='a';
-
     while(1)
     {
         do{
             system("cls");
-            std::cout<<metodo[indMetodo]<<": "<<url<<" |\n";
+            std::cout<<metodo<<": "<<url<<" |\n";
             std::cout<<"\nHeader: \n";
             for(int i=0; i<nHeaders; i++)
             {
@@ -79,7 +106,7 @@ void Menu()
                 cout<<campoForm[i]<<std::endl;
             }
 
-            sendStr=calcolaRichiesta(metodo[indMetodo], url, nHeaders, header, nCookies, cookie, nCampiForm, campoForm, nParametri, parametro, server);
+            sendStr=calcolaRichiesta(metodo, url, nHeaders, header, nCookies, cookie, nCampiForm, campoForm, nParametri, parametro, server);
             cout<<"\n"<<sendStr;
 
             std::cout<<"\n-Esci                 [a]";
@@ -103,9 +130,6 @@ void Menu()
         {
             case 'b':
                 {
-                    std::ofstream fout("data.txt");
-                    string risposta;
-                    string data, headerRisposta;
                     cout<<"\nInvio...\n";
                     risposta=invia(sendStr, server);
                     cout<<"\nRisposta ricevuta:\n"<<risposta<<"\nFine risposta\n";
@@ -127,11 +151,13 @@ void Menu()
                 {
                     std::ifstream fin("urlSalvato.txt");
                     fin>>url;
-                    fin>>indMetodo;
+                    fin>>metodo;
                     fin>>nHeaders;
                     fin>>nCookies;
                     fin>>nParametri;
                     fin>>nCampiForm;
+
+
                     for(int i=0; i<nHeaders; i++)
                     {
                         fin>>header[i];
@@ -147,9 +173,10 @@ void Menu()
                         fin>>parametro[i];
                     }
 
+                    getline(fin, campoForm[0]);
                     for(int i=0; i<nCampiForm; i++)
                     {
-                        fin>>campoForm[i];
+                        getline(fin, campoForm[i]);
                     }
                     fin.close();
                 }
@@ -160,7 +187,7 @@ void Menu()
                 {
                     std::ofstream fout("urlSalvato.txt");
                     fout<<url<<std::endl;
-                    fout<<indMetodo<<" "<<nHeaders<<" "<<nCookies<<" "<<nParametri<<" "<<nCampiForm<<std::endl;;
+                    fout<<metodo<<" "<<nHeaders<<" "<<nCookies<<" "<<nParametri<<" "<<nCampiForm<<std::endl;;
                     for(int i=0; i<nHeaders; i++)
                     {
                         fout<<header[i]<<std::endl;
@@ -224,8 +251,8 @@ void Menu()
             case 'k':
                 cout<<"\n\nMetodi:\n";
                 for(int i=0; i<6; i++)
-                    cout<<i<<": "<<metodo[i]<<endl;
-                cin>>indMetodo;
+                    cout<<listMetodo[i]<<endl;
+                cin>>metodo;
                 cin.ignore();
             break;
 
@@ -237,7 +264,7 @@ void Menu()
                     {
                         getline(fin, tmpUrl);
                         url+=tmpUrl+"\t\n";
-                        cout<<"\na"<<tmpUrl;
+                        cout<<"\nURL:\n"<<tmpUrl;
                     }
                     cout<<"\n\nMessaggio salvato:\n"<<url;
                     std::ofstream fout("data.txt");
@@ -267,7 +294,7 @@ void Menu()
             case 'a':
                 return;
         }
-    }
+    }//*/
 }
 
 string calcolaRichiesta(string metodo, string url, int nHeaders, string header[], int nCookies, string cookie[], int nCampiForm, string campoForm[], int nParametri, string parametro[], string &server)
@@ -275,6 +302,7 @@ string calcolaRichiesta(string metodo, string url, int nHeaders, string header[]
     string sendBuffer="";
     string filepath, filename;
     string::size_type n;
+
     //  Elimina https
     if (url.substr(0,7) == "http://")
         url.erase(0,7);
@@ -290,7 +318,6 @@ string calcolaRichiesta(string metodo, string url, int nHeaders, string header[]
         n = filepath.rfind('/');
         filename = filepath.substr(n+1);
     }
-
     else
     {
         server = url;
@@ -298,16 +325,22 @@ string calcolaRichiesta(string metodo, string url, int nHeaders, string header[]
         filename = "";
     }
 
-    sendBuffer=metodo+" "+filepath;
+    string met=metodo;
+    if(met=="POSTjson")met="POST";
+    sendBuffer=met+" "+filepath;
 
-    for(int i=0; i<nParametri; i++)
-        sendBuffer+="?"+parametro[i];
+    if(nParametri>0)
+    {
+        sendBuffer+="?"+parametro[0];
+        for(int i=1; i<nParametri; i++)
+            sendBuffer+="&"+parametro[i]; //campo=valore
+    }
 
     sendBuffer+=" HTTP/1.0\r\nHost: "+server;
 
     for(int i=0; i<nHeaders; i++)
     {
-        sendBuffer+="\r\n"+header[i];
+        sendBuffer+="\r\n"+header[i];//campo: valore, valore2
     }
 
     if(nCookies>0)
@@ -315,32 +348,66 @@ string calcolaRichiesta(string metodo, string url, int nHeaders, string header[]
         sendBuffer+="\r\nCookie: "+cookie[0];
         for(int i=1; i<nCookies; i++)
         {
-            sendBuffer+=";"+cookie[i];
+            sendBuffer+="; "+cookie[i];//campo=valore
         }
     }
 
 
     if(metodo=="POST")
     {
+        string body="";
 
-        /*
-        string accCampi=campoForm[0];
+        ///---------///
+
+        body=campoForm[0];
         for(int i=1; i<nCampiForm; i++)
-            accCampi+="&"+campoForm[i];
+            body+="&"+campoForm[i];//campo=valore
         sendBuffer+="\r\nContent-Type: application/x-www-form-urlencoded";
-        */
-        string accCampi="{\"username\" : \"admin\", \"password\" : \"admin\"}\r\n";
-        sendBuffer+="\r\nContent-Type: application/json";
-        sendBuffer+="\r\nContent-Length: "+to_string(accCampi.size());
 
+        /*//---------///
+
+        body="{";
+        if(nCampiForm>0)
+            body+=campoForm[0];
+        for(int i=1; i<nCampiForm; i++)
+            body+=", "+campoForm[i];//campo=valore
+        body+="}\r\n";//{"campo" : "valore", "campo2" : "valore2"}
+        sendBuffer+="\r\nContent-Type: application/json";
+        sendBuffer+="\r\nContent-Length: "+to_string(body.size());
         sendBuffer+="\r\n\r\n";
-        sendBuffer+=accCampi;
+
+        ///---------//*/
+
+        sendBuffer+="\r\nContent-Length: "+to_string(body.size());
+        sendBuffer+="\r\n\r\n";
+        sendBuffer+=body;
         sendBuffer+="\r\n";
     }
     else
+    {
+    if(metodo=="POSTjson")
+    {
+        string body="";
+
+        body="{";
+        if(nCampiForm>0)
+            body+=campoForm[0];
+        for(int i=1; i<nCampiForm; i++)
+            body+=", "+campoForm[i];//campo=valore
+        body+="}\r\n";//{"campo" : "valore", "campo2" : "valore2"}
+        sendBuffer+="\r\nContent-Type: application/json";
+        sendBuffer+="\r\nContent-Length: "+to_string(body.size());
+        sendBuffer+="\r\n\r\n";
+
+
+
+        sendBuffer+="\r\nContent-Length: "+to_string(body.size());
+        sendBuffer+="\r\n\r\n";
+        sendBuffer+=body;
+        sendBuffer+="\r\n";
+    }
+    }
     sendBuffer+="\r\n\r\n";
-
-
 
     return sendBuffer;
 }
